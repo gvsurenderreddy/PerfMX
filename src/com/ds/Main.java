@@ -2,15 +2,8 @@ package com.ds;
 
 import java.util.List;
 
-import javax.usb.UsbConfiguration;
-import javax.usb.UsbDevice;
-import javax.usb.UsbEndpoint;
-import javax.usb.UsbException;
-import javax.usb.UsbHostManager;
-import javax.usb.UsbHub;
-import javax.usb.UsbInterface;
-import javax.usb.UsbPort;
-import javax.usb.UsbServices;
+import javax.usb.*;
+import javax.usb.UsbDeviceDescriptor;
 
 public class Main {
 
@@ -64,28 +57,28 @@ public class Main {
             }
         }
     }
+    public static UsbDevice findDevice(UsbHub hub, short vendorId, short productId)
+    {
+        for (UsbDevice device : (List<UsbDevice>) hub.getAttachedUsbDevices())
+        {
+            UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();
+            if (desc.idVendor() == vendorId && desc.idProduct() == productId) return device;
+            if (device.isUsbHub())
+            {
+                device = findDevice((UsbHub) device, vendorId, productId);
+                if (device != null) return device;
+            }
+        }
+        return null;
+    }
 
-    /**
-     * Main method.
-     *
-     * @param args
-     *            Command-line arguments (Ignored)
-     * @throws UsbException
-     *             When an USB error was reported which wasn't handled by this
-     *             program itself.
-     */
+    public static short deviceVid=(short)0x046d;
+    public static short devicePid=(short)0xc52b;
+    private static UsbDevice deviceInstance;
+
     public static void main(final String[] args) throws UsbException
     {
-        // Get the USB services and dump information about them
-        final UsbServices services = UsbHostManager.getUsbServices();
-        System.out.println("USB Service Implementation: "
-                + services.getImpDescription());
-        System.out.println("Implementation version: "
-                + services.getImpVersion());
-        System.out.println("Service API version: " + services.getApiVersion());
-        System.out.println();
-
-        // Dump the root USB hub
-        dumpDevice(services.getRootUsbHub());
+        deviceInstance = findDevice(UsbHostManager.getUsbServices().getRootUsbHub(), deviceVid, devicePid);
+        dumpDevice(deviceInstance);
     }
 }
