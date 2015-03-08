@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="usb4java-1.2.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/usb4java-1.2.0.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="jar://$PROJECT_DIR$/lib/usb4java-1.2.0.zip!/" recursive="false" />
+  </library>
+</component>
