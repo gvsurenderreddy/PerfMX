@@ -80,5 +80,37 @@ public class Main {
     {
         deviceInstance = findDevice(UsbHostManager.getUsbServices().getRootUsbHub(), deviceVid, devicePid);
         dumpDevice(deviceInstance);
+
+        UsbConfiguration configuration = deviceInstance.getActiveUsbConfiguration();
+        UsbInterface iface = configuration.getUsbInterface((byte) 1);
+        iface.claim(new UsbInterfacePolicy()
+        {
+            @Override
+            public boolean forceClaim(UsbInterface usbInterface)
+            {
+                return true;
+            }
+        });
+        try
+        {
+            //code here
+            UsbEndpoint endpoint = iface.getUsbEndpoint((byte)0x83);
+            UsbPipe pipe = endpoint.getUsbPipe();
+            pipe.open();
+            try
+            {
+                int sent = pipe.syncSubmit(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+                System.out.println(sent + " bytes sent");
+            }
+            finally
+            {
+                pipe.close();
+            }
+        }
+        finally
+        {
+            iface.release();
+        }
+
     }
 }
