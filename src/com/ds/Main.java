@@ -82,7 +82,7 @@ public class Main {
         dumpDevice(deviceInstance);
 
         UsbConfiguration configuration = deviceInstance.getActiveUsbConfiguration();
-        UsbInterface iface = configuration.getUsbInterface((byte) 1);
+        UsbInterface iface = configuration.getUsbInterface((byte)0);
         iface.claim(new UsbInterfacePolicy()
         {
             @Override
@@ -90,10 +90,16 @@ public class Main {
             {
                 return true;
             }
-        });
+        }); /* <==
+                this fails on windows -
+                "Please note that interface policies are just a hint for the underlying USB implementation.
+                In case of usb4java the policy will be ignored on Windows because
+                ** libusb doesn't support detaching drivers on Windows.** "
+                ~ http://usb4java.org/quickstart/javax-usb.html
+            */ //unfortunatelly this closes chance of uf using usb4java on this project (hence java is going to be replaced with C# .NET)
+
         try
         {
-            //code here
             UsbEndpoint endpoint = iface.getUsbEndpoint((byte)0x83);
             UsbPipe pipe = endpoint.getUsbPipe();
             pipe.open();
